@@ -1,0 +1,303 @@
+###      **ASSIGNMENT1**
+> use books
+switched to db books
+
+> db.createCollection("books")
+{ "ok" : 1 }
+
+> db.books.save({_id:1,Category:"Machine Learning",BookName:"Machine Learning for Hackers",Author:"Drew Conway",qty:25,price:400,rol:30,pages:350})
+WriteResult({ "nMatched" : 0, "nUpserted" : 1, "nModified" : 0, "_id" : 1 })
+
+> db.books.save({_id:2,Category:"Business Intelligence",BookName:"Fundamentals of Business Analytics",Author:"Seema Acharya",qty:55,price:500,rol:30,pages:250})
+WriteResult({ "nMatched" : 0, "nUpserted" : 1, "nModified" : 0, "_id" : 2 })
+
+> db.books.save({_id:3,Category:"Analytics",BookName:"Competing on Analytics",Author:"Thomas",qty:8,price:150,rol:20,pages:150})
+WriteResult({ "nMatched" : 0, "nUpserted" : 1, "nModified" : 0, "_id" : 3 })
+
+> db.books.save({_id:4,Category:"Visualisation",BookName:"Visualising Data",Author:"Ben Fry",qty:12,price:325,rol:6,pages:450})
+WriteResult({ "nMatched" : 0, "nUpserted" : 1, "nModified" : 0, "_id" : 4 })
+
+> db.books.save({_id:5,Category:"Web Mining",BookName:"Learning R",Author:"Richard",qty:6,price:850,rol:10,pages:120})
+WriteResult({ "nMatched" : 0, "nUpserted" : 1, "nModified" : 0, "_id" : 5 })
+
+> db.books.find().pretty()
+{
+	"_id" : 1,
+	"Category" : "Machine Learning",
+	"BookName" : "Machine Learning for Hackers",
+	"Author" : "Drew Conway",
+	"qty" : 25,
+	"price" : 400,
+	"rol" : 30,
+	"pages" : 350
+}
+{
+	"_id" : 2,
+	"Category" : "Business Intelligence",
+	"BookName" : "Fundamentals of Business Analytics",
+	"Author" : "Seema Acharya",
+	"qty" : 55,
+	"price" : 500,
+	"rol" : 30,
+	"pages" : 250
+}
+{
+	"_id" : 3,
+	"Category" : "Analytics",
+	"BookName" : "Competing on Analytics",
+	"Author" : "Thomas",
+	"qty" : 8,
+	"price" : 150,
+	"rol" : 20,
+	"pages" : 150
+}
+{
+	"_id" : 4,
+	"Category" : "Visualisation",
+	"BookName" : "Visualising Data",
+	"Author" : "Ben Fry",
+	"qty" : 12,
+	"price" : 325,
+	"rol" : 6,
+	"pages" : 450
+}
+{
+	"_id" : 5,
+	"Category" : "Web Mining",
+	"BookName" : "Learning R",
+	"Author" : "Richard",
+	"qty" : 6,
+	"price" : 850,
+	"rol" : 10,
+	"pages" : 120
+}
+> 
+> 
+> var map = function(){
+...     var category;
+...     if(this.pages>=300)
+...         category = "Big books"
+...     else
+...         category = "Small Books"
+...     emit(category, {
+...         Bookname : this.Bookname});
+... }
+
+> var reduce = function(key, values){
+...    return values.length    
+... };
+
+
+> db.books.mapReduce(map, reduce, {out: "Bookcategory"})
+{
+	"result" : "Bookcategory",
+	"timeMillis" : 678,
+	"counts" : {
+		"input" : 5,
+		"emit" : 5,
+		"reduce" : 2,
+		"output" : 2
+	},
+	"ok" : 1
+}
+
+
+> db.Bookcategory.find().pretty()
+{ "_id" : "Big books", "value" : 2 }
+{ "_id" : "Small Books", "value" : 3 }
+
+
+
+######################################### program 2 #########################################
+
+> use test
+switched to db test
+
+$ mongoimport --type=csv --db test  --collection trees --file trees.csv --headerline
+2020-10-15T10:20:56.465+0530	connected to: localhost
+2020-10-15T10:20:57.033+0530	imported 31 documents
+
+> db.trees.aggregate([{$limit: 5}]).pretty();
+{
+	"_id" : ObjectId("5f87d530945afa535d16200b"),
+	"Index" : 2,
+	"Girth (in)" : 8.6,
+	"Height (ft)" : 65,
+	"Volume(ft^3)" : 10.3
+}
+{
+	"_id" : ObjectId("5f87d530945afa535d16200c"),
+	"Index" : 4,
+	"Girth (in)" : 10.5,
+	"Height (ft)" : 72,
+	"Volume(ft^3)" : 16.4
+}
+{
+	"_id" : ObjectId("5f87d530945afa535d16200d"),
+	"Index" : 1,
+	"Girth (in)" : 8.3,
+	"Height (ft)" : 70,
+	"Volume(ft^3)" : 10.3
+}
+{
+	"_id" : ObjectId("5f87d530945afa535d16200e"),
+	"Index" : 6,
+	"Girth (in)" : 10.8,
+	"Height (ft)" : 83,
+	"Volume(ft^3)" : 19.7
+}
+{
+	"_id" : ObjectId("5f87d530945afa535d16200f"),
+	"Index" : 11,
+	"Girth (in)" : 11.3,
+	"Height (ft)" : 79,
+	"Volume(ft^3)" : 24.2
+}
+
+
+> db.trees.aggregate([
+	{$group : {_id : null, sum_volume : {$sum : "$Volume(ft^3)"}}} 
+	])
+
+{ "_id" : null, "sum_volume" : 935.3 }
+
+> db.trees.aggregate([
+	{$group : {_id : "Average height of trees", Average_height : {$avg : "$Height (ft)"}}}
+	])
+
+{ "_id" : "Average height of trees", "Average_height" : 76 }
+
+######################################### program 3 #########################################
+
+> use Array
+switched to db Array
+
+> db.createCollection("Country")
+{ "ok" : 1 }
+
+> db.Country.insert({_id:1,Cities:["Bangalore","Chennai"]})
+WriteResult({ "nInserted" : 1 })
+
+> db.Country.insert({_id:2,Cities:["Hyderabad","Mumbai","Delhi"]})
+WriteResult({ "nInserted" : 1 })
+
+> db.Country.insert({_id:3,Cities:["rajamundry","jamshedpur","Jodhpur"]})
+WriteResult({ "nInserted" : 1 })
+
+> db.Country.find().pretty()
+{ "_id" : 1, "Cities" : [ "Bangalore", "Chennai" ] }
+{ "_id" : 2, "Cities" : [ "Hyderabad", "Mumbai", "Delhi" ] }
+{ "_id" : 3, "Cities" : [ "rajamundry", "jamshedpur", "Jodhpur" ] }
+
+> db.Country.update({_id:1},{$push:{population:{Bangalore:30,Chennai:45}}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+> db.Country.find().pretty()
+{
+	"_id" : 1,
+	"Cities" : [
+		"Bangalore",
+		"Chennai"
+	],
+	"population" : [
+		{
+			"Bangalore" : 30,
+			"Chennai" : 45
+		}
+	]
+}
+{ "_id" : 2, "Cities" : [ "Hyderabad", "Mumbai", "Delhi" ] }
+{ "_id" : 3, "Cities" : [ "rajamundry", "jamshedpur", "Jodhpur" ] }
+> db.Country.update({_id:3},{$pop:{Cities:1}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+
+> db.Country.find().pretty()
+{
+	"_id" : 1,
+	"Cities" : [
+		"Bangalore",
+		"Chennai"
+	],
+	"population" : [
+		{
+			"Bangalore" : 30,
+			"Chennai" : 45
+		}
+	]
+}
+
+{ "_id" : 2, "Cities" : [ "Hyderabad", "Mumbai", "Delhi" ] }
+{ "_id" : 3, "Cities" : [ "rajamundry", "jamshedpur" ] }
+
+
+> db.Country.update({Cities:"Hyderabad"},{$pull:{Cities:'Hyderabad'}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+
+> db.Country.find().pretty()
+{
+	"_id" : 1,
+	"Cities" : [
+		"Bangalore",
+		"Chennai"
+	],
+	"population" : [
+		{
+			"Bangalore" : 30,
+			"Chennai" : 45
+		}
+	]
+}
+{ "_id" : 2, "Cities" : [ "Mumbai", "Delhi" ] }
+{ "_id" : 3, "Cities" : [ "rajamundry", "jamshedpur" ] }
+
+
+> db.Country.update({_id:1},{$set:{'Cities.2':'Srinagar'}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+
+> db.Country.update({_id:2},{$addToSet:{Cities:"Trichi"}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+
+>db.Country.find().pretty()
+{
+	"_id" : 1,
+	"Cities" : [
+		"Bangalore",
+		"Chennai",
+		"Srinagar"
+	],
+	"population" : [
+		{
+			"Bangalore" : 30,
+			"Chennai" : 45
+		}
+	]
+}
+{ "_id" : 2, "Cities" : [ "Mumbai", "Delhi", "Trichi" ] }
+{ "_id" : 3, "Cities" : [ "rajamundry", "jamshedpur" ] }
+
+> db.Country.findOne()
+{
+	"_id" : 1,
+	"Cities" : [
+		"Bangalore",
+		"Chennai",
+		"Srinagar"
+	],
+	"population" : [
+		{
+			"Bangalore" : 30,
+			"Chennai" : 45
+		}
+	]
+}
+
+> db.Country.insert({_id:4,Cities:["Agra","Pune","Indore"]})
+WriteResult({ "nInserted" : 1 })
+
+> db.Country.find().skip(2).limit(2)
+{ "_id" : 3, "Cities" : [ "rajamundry", "jamshedpur" ] }
+{ "_id" : 4, "Cities" : [ "Agra", "Pune", "Indore" ] }
